@@ -1,3 +1,5 @@
 /venv
 /.mypy_cache
 /.env
+/bungee/slack_events/
+*/__pycache__/*

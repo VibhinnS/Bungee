@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import env_utils
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,7 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders'
+    'corsheaders',
+    'django_celery_beat',
+    'django_celery_results',
+    'slack_events'
 ]
 
 MIDDLEWARE = [
@@ -124,3 +128,14 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#celery -A bungee --beat -l info
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_BROKER_URL = env_utils.config("CELERY_BROKER_URL", default=None, cast=str)
+
+#helps Celery use the database and run various tasks
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
+#for redis
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_REDIS_BACKEND_USE_SSL = True
+CELERY_BROKER_USE_SSL = True

@@ -2,3 +2,7 @@ django
 requests
 django-cors-headers
 python-decouple
+Celery
+Redis
+django-celery-beat
+django-celery-results

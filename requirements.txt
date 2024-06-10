@@ -6,3 +6,5 @@ Celery
 Redis
 django-celery-beat
 django-celery-results
+gevent
+openai

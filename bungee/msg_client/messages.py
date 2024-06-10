@@ -1,13 +1,10 @@
 import requests
 import env_utils
 
-class JSON:
-    pass
-
 SLACK_BOT_OAUTH_TOKEN = env_utils.config('SLACK_BOT_OAUTH_TOKEN', default=None, cast=str)
 
 
-def send_message_from_slackbot_to_user(message :str, channel_id :str | None = None, user_id :str | None = None, thread_timestamp : str | None = None) -> JSON:
+def send_message_from_slackbot_to_user(message :str, channel_id :str | None = None, user_id :str | None = None, thread_timestamp : str | None = None):
     url= "https://slack.com/api/chat.postMessage"
     headers = {
         "Content-Type": "application/json; charset=utf-8",
@@ -17,6 +14,8 @@ def send_message_from_slackbot_to_user(message :str, channel_id :str | None = No
 
     if user_id is not None:
         message = f"<@{user_id}> {message}"
+    
+    print(message)
 
     data = {
         "channel" :f"{channel_id}",

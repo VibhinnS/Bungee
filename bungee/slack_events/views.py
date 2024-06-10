@@ -8,30 +8,12 @@ from pprint import pprint
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from .tasks import slack_message_task
 
 class JSON:
     pass
 
 SLACK_BOT_OAUTH_TOKEN = env_utils.config('SLACK_BOT_OAUTH_TOKEN', default=None, cast=str)
-
-
-def send_message_from_slackbot_to_user(message :str, channel_id :str | None = None, user_id :str | None = None) -> JSON:
-    url= "https://slack.com/api/chat.postMessage"
-    headers = {
-        "Content-Type": "application/json; charset=utf-8",
-        "Authorization": f"Bearer {SLACK_BOT_OAUTH_TOKEN}",
-        "Accept":"application/json"
-    }
-
-    if user_id is not None:
-        message = f"<@{user_id}> {message}"
-
-    data = {
-        "channel" :f"{channel_id}",
-        "text": f"{message}".strip()
-    }
-
-    return requests.post(url, json=data, headers=headers)
 
 
 @csrf_exempt
@@ -66,6 +48,7 @@ def slack_events_controller(request):
         channel_id = event.get('channel')
         message_timestamp :str = event.get('ts')
         thread_timestamp :str = event.get('event_ts') or message_timestamp
-        bot_message_to_user = msg_client.send_message_from_slackbot_to_user(msg_text, channel_id=channel_id, user_id=user_id, thread_timestamp = thread_timestamp)
+        # bot_message_to_user = msg_client.send_message_from_slackbot_to_user(msg_text, channel_id=channel_id, user_id=user_id, thread_timestamp = thread_timestamp)
+        slack_message_task.delay(msg_text, channel_id=channel_id, user_id=user_id, thread_timestamp = thread_timestamp)
         return HttpResponse("Success", status=200)
     return HttpResponse("Success", status=200)
